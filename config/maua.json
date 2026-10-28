@@ -1,0 +1,32 @@
+{
+  "cidade": "Mauá",
+  "uf": "SP",
+  "_aviso": "Protótipo. Tempos de deslocamento são estimativas iniciais; ajuste com a Secretaria de Saúde.",
+  "unidades": [
+    {"id": "barao", "nome": "UPA Barão de Mauá", "bairro": "Barão de Mauá", "tipo": "UPA", "fator": 1.15},
+    {"id": "zaira", "nome": "UPA Zaíra", "bairro": "Jardim Zaíra", "tipo": "UPA", "fator": 1.30},
+    {"id": "magini", "nome": "UPA Magini", "bairro": "Vila Magini", "tipo": "UPA", "fator": 0.95},
+    {"id": "assis", "nome": "UPA Vila Assis (Waldemar Coppini)", "bairro": "Vila Assis Brasil", "tipo": "UPA", "fator": 0.80}
+  ],
+  "regioes": [
+    {"id": "centro", "nome": "Centro"},
+    {"id": "barao", "nome": "Barão de Mauá e região"},
+    {"id": "zaira", "nome": "Zaíra e região"},
+    {"id": "magini", "nome": "Magini e região"},
+    {"id": "assis", "nome": "Vila Assis e região"}
+  ],
+  "deslocamento_min": {
+    "centro": {"barao": 12, "zaira": 15, "magini": 10, "assis": 10},
+    "barao":  {"barao": 5,  "zaira": 25, "magini": 15, "assis": 18},
+    "zaira":  {"barao": 25, "zaira": 5,  "magini": 18, "assis": 15},
+    "magini": {"barao": 15, "zaira": 18, "magini": 5,  "assis": 15},
+    "assis":  {"barao": 18, "zaira": 15, "magini": 15, "assis": 5}
+  },
+  "ubs": {
+    "horario": "segunda a sexta, das 7h às 17h",
+    "dias_uteis": [0, 1, 2, 3, 4],
+    "abre": 7,
+    "fecha": 17
+  },
+  "telefones": {"samu": "192", "bombeiros": "193"}
+}

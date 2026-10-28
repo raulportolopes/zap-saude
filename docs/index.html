@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Zap-Saúde Mauá</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: o celular com a conversa à esquerda, o painel da recepção à direita; empilha no celular. */
+:root {
+  --bg: #eef2f1; --surface: #ffffff; --ink: #14211f; --muted: #5b6b68; --line: #d3dcda;
+  --accent: #0b6b62; --accent-ink: #ffffff; --accent-soft: #d8ece9;
+  --chat: #e6ebe4; --bot: #ffffff; --me: #cfe9d6;
+  --amarelo: #c98a00; --verde: #2f8f46; --azul: #2c6fb7; --alarme: #b42318;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1716; --surface: #172221; --ink: #e5eeec; --muted: #9db0ac; --line: #2b3a38;
+  --accent: #3fb8a9; --accent-ink: #062a26; --accent-soft: #173c38;
+  --chat: #111c1a; --bot: #1d2b29; --me: #1f4a35;
+  --amarelo: #f0b429; --verde: #5cc475; --azul: #6aa8ec; --alarme: #ff7a6b; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1716; --surface: #172221; --ink: #e5eeec; --muted: #9db0ac; --line: #2b3a38;
+  --accent: #3fb8a9; --accent-ink: #062a26; --accent-soft: #173c38;
+  --chat: #111c1a; --bot: #1d2b29; --me: #1f4a35;
+  --amarelo: #f0b429; --verde: #5cc475; --azul: #6aa8ec; --alarme: #ff7a6b; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 40px }
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px }
+header h1 { font: 800 clamp(26px, 4vw, 34px)/1.1 var(--display); margin: 0; text-wrap: balance }
+header p { margin: 6px 0 0; color: var(--muted); max-width: 68ch }
+.tag { display: inline-block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 6px }
+.grid { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 20px; align-items: start }
+@media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr) } }
+
+.phone { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; height: 680px; max-height: 80vh; min-height: 520px }
+.phone-top { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--accent); color: var(--accent-ink) }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-ink); color: var(--accent); display: grid; place-items: center; font: 800 15px var(--display) }
+.phone-top b { display: block; font-family: var(--display); font-weight: 600 }
+.phone-top small { opacity: .85 }
+.chat { flex: 1; overflow-y: auto; background: var(--chat); padding: 14px 12px; display: flex; flex-direction: column; gap: 8px }
+.msg { max-width: 86%; padding: 8px 11px 6px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; box-shadow: 0 1px 0 rgba(0,0,0,.06) }
+.msg.bot { background: var(--bot); align-self: flex-start; border-top-left-radius: 4px }
+.msg.me { background: var(--me); align-self: flex-end; border-top-right-radius: 4px }
+.msg .hora { display: block; text-align: right; font-size: 11px; color: var(--muted); margin-top: 2px }
+.msg.alarme { border-left: 4px solid var(--alarme) }
+.acoes { display: flex; flex-direction: column; gap: 6px; align-self: flex-start; width: 86% }
+.acoes button, .lista button { font: 700 14px var(--body); color: var(--accent); background: var(--bot); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; cursor: pointer; text-align: center }
+.acoes button:disabled, .lista button:disabled { opacity: .45; cursor: default }
+.lista { display: grid; gap: 4px; align-self: flex-start; width: 86% }
+.lista button { text-align: left; font-weight: 400; color: var(--ink) }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.audio { display: flex; align-items: center; gap: 8px; min-width: 210px }
+.audio button { width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; font-size: 14px; flex: none }
+.onda { flex: 1; height: 22px; background: repeating-linear-gradient(90deg, var(--muted) 0 2px, transparent 2px 5px); opacity: .5; border-radius: 2px; -webkit-mask: linear-gradient(0deg, #000 30%, transparent 30% 70%, #000 70%) }
+.transc { font-size: 12.5px; color: var(--muted); margin-top: 4px; font-style: italic }
+.composer { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); background: var(--surface) }
+.composer input { flex: 1; min-width: 0; font: 15px var(--body); padding: 10px 12px; border-radius: 20px; border: 1px solid var(--line); background: var(--bg); color: var(--ink) }
+.composer button { border: 0; border-radius: 20px; padding: 0 14px; font: 700 14px var(--body); background: var(--accent); color: var(--accent-ink); cursor: pointer }
+.composer .mic { background: var(--accent-soft); color: var(--accent) }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 16px; min-width: 0 }
+.panel h2 { font: 600 20px/1.2 var(--display); margin: 0 }
+.panel > p { margin: -8px 0 0; color: var(--muted) }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
+.row label { color: var(--muted); font-size: 13.5px }
+select { font: 14px var(--body); padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink) }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums }
+.tbl { overflow-x: auto }
+th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); vertical-align: middle }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700 }
+td.n { text-align: right; white-space: nowrap }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: middle }
+.chip { font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); white-space: nowrap }
+.chip.sim { background: transparent; border: 1px dashed var(--line); color: var(--muted) }
+input[type=range] { width: 100%; min-width: 72px; max-width: 140px; accent-color: var(--accent) }
+.btn { font: 700 14px var(--body); border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 8px; padding: 8px 12px; cursor: pointer }
+.nota { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin: 0 }
+@media (prefers-reduced-motion: no-preference) { .msg { animation: entra .18s ease-out } @keyframes entra { from { transform: translateY(4px); opacity: .4 } } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="tag">Protótipo · dados simulados</span>
+    <h1>Zap-Saúde Mauá</h1>
+    <p>Teste a conversa como o morador veria no WhatsApp: consulte a espera nas 4 UPAs de Mauá, descubra para onde ir e mande um áudio. No painel ao lado, faça o papel da recepção da UPA e veja a resposta mudar.</p>
+  </header>
+
+  <div class="grid">
+    <section class="phone" aria-label="Simulação da conversa">
+      <div class="phone-top"><div class="avatar">Z</div><div><b>Zap-Saúde Mauá</b><small>protótipo não oficial</small></div></div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <form class="composer" id="composer">
+        <button type="button" class="mic" id="mic" title="Simular mensagem de áudio">🎤 Áudio</button>
+        <input id="texto" autocomplete="off" placeholder="Digite: oi, UPA, onde ir...">
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+
+    <section class="panel" aria-label="Painel da recepção">
+      <div>
+        <span class="tag">Painel da recepção (nível 1)</span>
+        <h2>Fila das UPAs agora</h2>
+      </div>
+      <p>Sem dado informado, o bot usa uma simulação que muda com o horário. Mova a barra para informar a espera da classificação verde; amarela e azul acompanham.</p>
+      <div class="row">
+        <label for="hora">Horário da simulação</label>
+        <select id="hora">
+          <option value="agora">Agora</option>
+          <option value="3">03h (madrugada)</option>
+          <option value="10">10h (pico da manhã)</option>
+          <option value="15">15h</option>
+          <option value="20">20h (pico da noite)</option>
+        </select>
+        <button class="btn" id="avancar" type="button">Avançar 5 min e checar avisos</button>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Unidade</th><th class="n"><span class="dot" style="background:var(--amarelo)"></span>Amar.</th><th class="n"><span class="dot" style="background:var(--verde)"></span>Verde</th><th class="n"><span class="dot" style="background:var(--azul)"></span>Azul</th><th>Informar</th></tr></thead>
+          <tbody id="tabela"></tbody>
+        </table>
+      </div>
+      <p class="nota">Unidades: UPA Barão de Mauá, UPA Zaíra, UPA Magini e UPA Vila Assis (Waldemar Coppini), reaberta após reforma em outubro de 2026. Tempos de espera e de deslocamento são estimativas para demonstração e precisam ser substituídos por dados da Secretaria de Saúde. A triagem não substitui avaliação médica.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+const CFG = {
+  cidade: "Mauá",
+  unidades: [
+    { id: "barao", nome: "UPA Barão de Mauá", fator: 1.15 },
+    { id: "zaira", nome: "UPA Zaíra", fator: 1.30 },
+    { id: "magini", nome: "UPA Magini", fator: 0.95 },
+    { id: "assis", nome: "UPA Vila Assis (Waldemar Coppini)", fator: 0.80 }
+  ],
+  regioes: [
+    { id: "centro", nome: "Centro" }, { id: "barao", nome: "Barão de Mauá e região" },
+    { id: "zaira", nome: "Zaíra e região" }, { id: "magini", nome: "Magini e região" },
+    { id: "assis", nome: "Vila Assis e região" }
+  ],
+  desloc: {
+    centro: { barao: 12, zaira: 15, magini: 10, assis: 10 },
+    barao: { barao: 5, zaira: 25, magini: 15, assis: 18 },
+    zaira: { barao: 25, zaira: 5, magini: 18, assis: 15 },
+    magini: { barao: 15, zaira: 18, magini: 5, assis: 15 },
+    assis: { barao: 18, zaira: 15, magini: 15, assis: 5 }
+  },
+  ubs: { horario: "segunda a sexta, das 7h às 17h", abre: 7, fecha: 17 }
+};
+const SINAIS = "• dor forte ou aperto no peito\n• falta de ar\n• desmaio, confusão ou convulsão\n• fala enrolada, boca torta ou fraqueza de um lado do corpo\n• sangramento que não para";
+const AUDIOS = [
+  "oi, qual UPA tá mais vazia agora? eu tô lá no Zaíra",
+  "quanto tempo tá a fila da UPA?",
+  "meu filho tá com febre, pra onde eu levo? moro no centro",
+  "tô com uma dor no peito e falta de ar"
+];
+
+// ---------- relógio e filas ----------
+let deslocamentoMin = 0;           // "Avançar 5 min"
+const manual = {};                 // unidade -> espera verde informada pela recepção
+function agora() {
+  const sel = document.getElementById("hora").value;
+  const d = new Date(Date.now() + deslocamentoMin * 60000);
+  if (sel !== "agora") d.setHours(Number(sel), d.getMinutes() % 60);
+  return d;
+}
+function rnd(seed) { let h = 2166136261; for (const c of seed) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 10000) / 10000; }
+function esperaSimulada(u, d) {
+  const hora = d.getHours() + d.getMinutes() / 60;
+  const pico = 0.55 + 0.45 * Math.max(Math.exp(-((hora - 10) ** 2) / 8), Math.exp(-((hora - 20) ** 2) / 6));
+  const bloco = Math.floor(d.getTime() / 300000);
+  return 120 * pico * u.fator * (0.85 + 0.30 * rnd(u.id + "-" + bloco));
+}
+function filas(d = agora()) {
+  return CFG.unidades.map(u => {
+    const v = manual[u.id] ?? esperaSimulada(u, d);
+    return { id: u.id, nome: u.nome, origem: manual[u.id] != null ? "manual" : "simulado",
+      espera: { amarelo: Math.max(5, Math.round(v * 0.35)), verde: Math.max(10, Math.round(v)), azul: Math.max(15, Math.round(v * 1.45)) } };
+  });
+}
+const fmt = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, "0")}`;
+const hhmm = d => d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+
+// ---------- conversa (baseada em app/conversa.py) ----------
+const estado = { etapa: "inicio" };
+let alerta = null;
+
+function intencao(texto) {
+  const t = norm(texto);
+  if (!t) return null;
+  if (estado.etapa === "triagem") {
+    if (["sim", "s", "tenho", "sim tenho"].includes(t)) return "alarme_sim";
+    if (["nao", "n", "nao tenho"].includes(t)) return "alarme_nao";
+  }
+  if (["192", "samu", "infarto", "nao consigo respirar", "falta de ar", "dor no peito", "desmai"].some(p => t.includes(p))) return "alarme_sim";
+  const regiao = CFG.regioes.find(r => t.includes(norm(r.nome).replace(" e regiao", "")));
+  if (regiao && (estado.etapa === "regiao" || /onde|leva|vou|vazia|perto/.test(t))) {
+    if (estado.etapa === "regiao") return "regiao_" + regiao.id;
+    estado.regiaoPendente = regiao.id; return "onde_ir";
+  }
+  if (["onde", "qual upa", "pra onde", "para onde", "vazia", "levo"].some(p => t.includes(p))) return "onde_ir";
+  if (["upa", "espera", "fila", "demora", "tempo"].some(p => t.includes(p))) return "espera";
+  if (t.includes("avis")) return "avisar";
+  return null;
+}
+
+function responder({ texto, botao }) {
+  const acao = botao || intencao(texto || "");
+  const d = agora();
+  if (acao === "espera") return respEspera(d);
+  if (acao === "onde_ir") { estado.etapa = "triagem"; return [{ tipo: "botoes", texto: `Antes, uma pergunta rápida. Você tem algum destes sinais agora?\n\n${SINAIS}`, botoes: [["alarme_sim", "Sim, tenho"], ["alarme_nao", "Não"]] }]; }
+  if (acao === "alarme_sim") { estado.etapa = "inicio"; return [{ tipo: "texto", alarme: true, texto: "⚠️ Ligue agora para o SAMU: 192.\n\nNão espere fila nem compare unidades. Se alguém puder levar você, vá para a UPA mais próxima." }]; }
+  if (acao === "alarme_nao") {
+    if (estado.regiaoPendente) { const r = estado.regiaoPendente; delete estado.regiaoPendente; estado.etapa = "inicio"; return recomendar(r, d); }
+    estado.etapa = "regiao";
+    return [{ tipo: "lista", texto: "Certo. Em que região de Mauá você está agora?", itens: CFG.regioes.map(r => ["regiao_" + r.id, r.nome]) }];
+  }
+  if (acao && acao.startsWith("regiao_")) { estado.etapa = "inicio"; return recomendar(acao.slice(7), d); }
+  if (acao === "avisar") return criarAlerta();
+  return [{ tipo: "botoes", texto: `Olá! Este é o Zap-Saúde de ${CFG.cidade}. Eu mostro a espera nas UPAs e indico a melhor unidade para você agora.\n\nVocê também pode mandar um áudio.`, botoes: [["espera", "Ver espera agora"], ["onde_ir", "Para onde eu vou?"]] }];
+}
+
+function respEspera(d) {
+  const fs = filas(d).sort((a, b) => a.espera.verde - b.espera.verde);
+  const linhas = fs.map(f => `*${f.nome}*\n🟡 ${fmt(f.espera.amarelo)} · 🟢 ${fmt(f.espera.verde)} · 🔵 ${fmt(f.espera.azul)}`);
+  const sim = fs.some(f => f.origem === "simulado");
+  return [{ tipo: "botoes", texto: "⏱️ Espera estimada nas UPAs agora, por cor da triagem:\n\n" + linhas.join("\n\n") +
+    `\n\n🟡 urgente · 🟢 pouco urgente · 🔵 não urgente\nCasos vermelhos são atendidos na hora.\nAtualizado às ${hhmm(d)}.` + (sim ? " _Dados simulados (protótipo)._" : ""),
+    botoes: [["onde_ir", "Para onde eu vou?"]] }];
+}
+
+function ranking(regiao, d) {
+  return filas(d).map(f => ({ ...f, ida: CFG.desloc[regiao][f.id], total: f.espera.verde + CFG.desloc[regiao][f.id] }))
+    .sort((a, b) => a.total - b.total);
+}
+
+function recomendar(regiao, d) {
+  const rank = ranking(regiao, d), m = rank[0];
+  estado.ultimaSugestao = m.id;
+  let texto = `✅ A melhor opção agora é a *${m.nome}*.\n\n` +
+    rank.slice(0, 3).map((r, i) => `${i + 1}. *${r.nome}*: cerca de ${fmt(r.total)} no total (${fmt(r.ida)} de deslocamento + ${fmt(r.espera.verde)} de espera)`).join("\n") +
+    "\n\nA espera considera a classificação verde, a mais comum para quem não tem sinais de alarme. Na UPA, a enfermagem faz a triagem e pode mudar a ordem.";
+  const dia = d.getDay();
+  if (dia >= 1 && dia <= 5 && d.getHours() >= CFG.ubs.abre && d.getHours() < CFG.ubs.fecha)
+    texto += `\n\n💡 Se for algo leve (resfriado, receita, exame, dor antiga), a UBS do seu bairro atende ${CFG.ubs.horario} e costuma ser mais rápida.`;
+  if (m.origem === "simulado") texto += "\n\n_Dados simulados (protótipo)._";
+  return [{ tipo: "botoes", texto, botoes: [["avisar", "Avisar se baixar"], ["espera", "Ver todas as UPAs"]] }];
+}
+
+function criarAlerta() {
+  if (!estado.ultimaSugestao) return [{ tipo: "texto", texto: "Primeiro me diga para onde você vai: toque em \"Para onde eu vou?\"." }];
+  const f = filas().find(x => x.id === estado.ultimaSugestao);
+  alerta = { unidade: f.id, nome: f.nome, limite: Math.max(15, Math.round(f.espera.verde * 0.7)) };
+  return [{ tipo: "texto", texto: `🔔 Combinado. Aviso você quando a espera na ${f.nome} ficar abaixo de ${fmt(alerta.limite)}.\n\nDica: no painel, baixe a fila dessa UPA e toque em "Avançar 5 min".` }];
+}
+
+function verificarAlerta() {
+  if (!alerta) return;
+  const f = filas().find(x => x.id === alerta.unidade);
+  if (f.espera.verde <= alerta.limite) {
+    mostrar([{ tipo: "texto", texto: `🔔 A espera na ${alerta.nome} baixou para ${fmt(f.espera.verde)}. Se ainda precisar, é uma boa hora.` }], false);
+    alerta = null;
+  }
+}
+
+function paraFala(respostas) {
+  return respostas.map(r => r.texto.replace(/[*_]/g, "").replace(/🟡/g, "amarelo").replace(/🟢/g, "verde").replace(/🔵/g, "azul")
+    .replace(/[⏱️✅💡⚠️🔔•]/gu, "").replace(/ · /g, ", ").replace(/(\d+)h(\d\d)/g, (_, h, m) => `${h} hora${h === "1" ? "" : "s"} e ${Number(m)} minutos`)
+    .replace(/(\d+) min\b/g, "$1 minutos")).join("\n");
+}
+
+// ---------- interface ----------
+const chat = document.getElementById("chat");
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const rich = s => esc(s).replace(/\*([^*\n]+)\*/g, "<b>$1</b>").replace(/_([^_\n]+)_/g, "<i>$1</i>");
+const rolar = () => { chat.scrollTop = chat.scrollHeight; };
+function bolha(cls, html) { const el = document.createElement("div"); el.className = "msg " + cls; el.innerHTML = html + `<span class="hora">${hhmm(new Date())}</span>`; chat.appendChild(el); return el; }
+
+function falar(texto, botao) {
+  if (!("speechSynthesis" in window)) { botao.textContent = "–"; return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(texto); u.lang = "pt-BR"; u.rate = 1.05;
+  const voz = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith("pt"));
+  if (voz) u.voice = voz;
+  botao.textContent = "■"; u.onend = u.onerror = () => { botao.textContent = "▶"; };
+  speechSynthesis.speak(u);
+}
+
+function mostrar(respostas, emAudio) {
+  chat.querySelectorAll(".acoes button, .lista button").forEach(b => b.disabled = true);
+  for (const r of respostas) {
+    bolha("bot" + (r.alarme ? " alarme" : ""), rich(r.texto));
+    if (r.tipo === "botoes") {
+      const box = document.createElement("div"); box.className = "acoes";
+      for (const [id, t] of r.botoes) { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.onclick = () => enviar({ botao: id, titulo: t }); box.appendChild(b); }
+      chat.appendChild(box);
+    }
+    if (r.tipo === "lista") {
+      const box = document.createElement("div"); box.className = "lista";
+      for (const [id, t] of r.itens) { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.onclick = () => enviar({ botao: id, titulo: t }); box.appendChild(b); }
+      chat.appendChild(box);
+    }
+  }
+  if (emAudio) {
+    const texto = paraFala(respostas);
+    const el = bolha("bot", `<div class="audio"><button type="button" aria-label="Ouvir resposta">▶</button><div class="onda"></div><small>${Math.max(5, Math.round(texto.split(/\s+/).length / 2.6))}s</small></div><div class="transc">Resposta em áudio (voz sintetizada). Toque no play.</div>`);
+    const b = el.querySelector("button"); b.onclick = () => (b.textContent === "■" ? (speechSynthesis.cancel(), b.textContent = "▶") : falar(texto, b));
+  }
+  rolar();
+}
+
+function enviar({ texto, botao, titulo, audio }) {
+  if (audio) bolha("me", `<div class="audio"><button type="button" disabled aria-hidden="true">▶</button><div class="onda"></div><small>0:0${3 + (texto.length % 6)}</small></div><div class="transc">Transcrição: “${esc(texto)}”</div>`);
+  else bolha("me", esc(titulo || texto));
+  rolar();
+  setTimeout(() => mostrar(responder({ texto, botao }), !!audio), 450);
+}
+
+let iAudio = 0;
+document.getElementById("mic").onclick = () => { enviar({ texto: AUDIOS[iAudio % AUDIOS.length], audio: true }); iAudio++; };
+document.getElementById("composer").onsubmit = e => {
+  e.preventDefault(); const i = document.getElementById("texto");
+  if (i.value.trim()) { enviar({ texto: i.value.trim() }); i.value = ""; }
+};
+
+// ---------- painel ----------
+function desenharTabela() {
+  const tb = document.getElementById("tabela");
+  tb.innerHTML = "";
+  for (const f of filas()) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${esc(f.nome.replace(" (Waldemar Coppini)", ""))}<br><span class="chip ${f.origem === "simulado" ? "sim" : ""}">${f.origem === "simulado" ? "simulado" : "informado"}</span></td>
+      <td class="n">${fmt(f.espera.amarelo)}</td><td class="n"><b>${fmt(f.espera.verde)}</b></td><td class="n">${fmt(f.espera.azul)}</td>
+      <td><input type="range" id="r-${f.id}" min="10" max="240" step="5" value="${f.espera.verde}" aria-label="Espera verde na ${esc(f.nome)}"></td>`;
+    tb.appendChild(tr);
+    tr.querySelector("input").oninput = e => { manual[f.id] = Number(e.target.value); atualizarLinha(tr, f.id); };
+    tr.querySelector("input").onchange = () => desenharTabela();
+  }
+}
+function atualizarLinha(tr, id) {
+  const f = filas().find(x => x.id === id), tds = tr.querySelectorAll("td");
+  tds[1].textContent = fmt(f.espera.amarelo); tds[2].innerHTML = `<b>${fmt(f.espera.verde)}</b>`; tds[3].textContent = fmt(f.espera.azul);
+  const chip = tds[0].querySelector(".chip"); chip.textContent = "informado"; chip.classList.remove("sim");
+}
+document.getElementById("hora").onchange = desenharTabela;
+document.getElementById("avancar").onclick = () => { deslocamentoMin += 5; desenharTabela(); verificarAlerta(); };
+
+desenharTabela();
+enviar({ texto: "oi" });
+</script>
+</body>
+</html>
