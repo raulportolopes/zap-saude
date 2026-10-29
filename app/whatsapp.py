@@ -15,7 +15,7 @@ def montar_payload(para: str, resposta: dict) -> dict:
     """Converte uma resposta do fluxo (conversa.py) no JSON da API."""
     base = {"messaging_product": "whatsapp", "to": para}
     if resposta["tipo"] == "texto":
-        return {**base, "type": "text", "text": {"body": resposta["texto"]}}
+        return {**base, "type": "text", "text": {"body": resposta["texto"][:4096], "preview_url": False}}
     if resposta["tipo"] == "botoes":
         return {**base, "type": "interactive", "interactive": {
             "type": "button",
@@ -33,6 +33,12 @@ def montar_payload(para: str, resposta: dict) -> dict:
                 "rows": [{"id": i, "title": t[:24], **({"description": d[:72]} if d else {})}
                          for i, t, d in resposta["itens"][:10]],
             }]},
+        }}
+    if resposta["tipo"] == "pedir_local":
+        return {**base, "type": "interactive", "interactive": {
+            "type": "location_request_message",
+            "body": {"text": resposta["texto"][:1024]},
+            "action": {"name": "send_location"},
         }}
     if resposta["tipo"] == "audio":
         return {**base, "type": "audio", "audio": {"id": resposta["media_id"], "voice": True}}

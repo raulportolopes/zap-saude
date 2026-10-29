@@ -1,0 +1,20 @@
+{
+  "cidade": "Guarulhos",
+  "uf": "SP",
+  "fonte": "https://guarulhos-portal.sissonline.com.br/servicos/tempo-espera-ps/estabelecimentos",
+  "_aviso": "Endereços e coordenadas não vêm do portal. Sem lat/lng, os links de trajeto buscam a unidade pelo nome no mapa.",
+  "unidades": {
+    "upa-taboao": {"nome": "UPA Taboão", "busca": "UPA Taboão Guarulhos SP"},
+    "upa-sao-joao-lavras": {"nome": "UPA São João / Lavras", "busca": "UPA São João Lavras Guarulhos SP", "apelidos": ["são joão", "lavras"]},
+    "upa-paulista": {"nome": "UPA Paulista", "busca": "UPA Paulista Guarulhos SP"},
+    "upa-cumbica": {"nome": "UPA Cumbica", "busca": "UPA Cumbica Guarulhos SP"},
+    "pronto-socorro-hmu": {"nome": "Pronto-Socorro HMU", "busca": "Hospital Municipal de Urgências Guarulhos SP", "apelidos": ["hospital municipal de urgências"]},
+    "pronto-socorro-hmpb": {"nome": "Pronto-Socorro HMPB", "busca": "Hospital Municipal Pimentas Bonsucesso Guarulhos SP", "apelidos": ["pimentas"]},
+    "p-a-paraventi": {"nome": "PA Paraventi", "busca": "Pronto Atendimento Paraventi Guarulhos SP"},
+    "p-a-maria-dirce": {"nome": "PA Maria Dirce", "busca": "Pronto Atendimento Maria Dirce Guarulhos SP"},
+    "p-a-dona-luiza": {"nome": "PA Dona Luiza", "busca": "Pronto Atendimento Dona Luiza Guarulhos SP"},
+    "p-a-bonsucesso": {"nome": "PA Bonsucesso", "busca": "Pronto Atendimento Bonsucesso Guarulhos SP"},
+    "p-a-alvorada": {"nome": "PA Alvorada", "busca": "Pronto Atendimento Alvorada Guarulhos SP"}
+  },
+  "telefones": {"samu": "192", "bombeiros": "193"}
+}
