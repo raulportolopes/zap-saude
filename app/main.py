@@ -1,50 +1,50 @@
-"""Servidor do Zap-Saúde: webhook do WhatsApp, painel de fila (nível 1) e alertas."""
+"""Servidor do Zap-Saúde: webhook do WhatsApp e coleta do painel da prefeitura a cada 5 minutos."""
 from __future__ import annotations
 
 import asyncio
 import hashlib
 import hmac
+import json
 import logging
 import os
 import time
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Request, Response
-from pydantic import BaseModel
 
 from . import whatsapp
 from .conversa import Conversa, como_texto
-from .fila import Repositorio, carregar_config
+from .siss import Coletor
 
 log = logging.getLogger("zap-saude")
 
-os.environ.setdefault("TZ", "America/Sao_Paulo")  # horários das respostas e da UBS
+os.environ.setdefault("TZ", "America/Sao_Paulo")  # horários das respostas
 time.tzset()
 
 RAIZ = Path(__file__).resolve().parent.parent
-config = carregar_config(os.getenv("CIDADE_CONFIG", RAIZ / "config" / "maua.json"))
-repo = Repositorio(config, os.getenv("DB_PATH", str(RAIZ / "fila.db")))
-conversa = Conversa(repo)
+with open(os.getenv("CIDADE_CONFIG", RAIZ / "config" / "guarulhos.json"), encoding="utf-8") as f:
+    config = json.load(f)
+coletor = Coletor(config["fonte"])
+conversa = Conversa(config, coletor, os.getenv("GOOGLE_MAPS_API_KEY") or None)
 
 VERIFY_TOKEN = os.getenv("WA_VERIFY_TOKEN", "troque-este-token")
 APP_SECRET = os.getenv("WA_APP_SECRET", "")
-ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
+INTERVALO_S = 5 * 60  # o portal da prefeitura atualiza a cada 5 minutos
 
 
-async def _loop_alertas():
+async def _loop_coleta():
     while True:
-        await asyncio.sleep(120)
-        for usuario, resposta in conversa.verificar_alertas():
-            try:
-                await whatsapp.enviar(usuario, resposta)
-            except Exception:
-                log.exception("falha ao enviar alerta")
+        await coletor.atualizar()
+        if coletor.erro:
+            log.warning("falha ao ler o portal: %s", coletor.erro)
+        await asyncio.sleep(INTERVALO_S)
 
 
 @asynccontextmanager
 async def lifespan(_app):
-    tarefa = asyncio.create_task(_loop_alertas())
+    tarefa = asyncio.create_task(_loop_coleta())
     yield
     tarefa.cancel()
 
@@ -77,7 +77,7 @@ async def receber(request: Request, tarefas: BackgroundTasks, x_hub_signature_25
 
 async def processar(msg: dict) -> None:
     usuario, tipo = msg["from"], msg["type"]
-    texto = botao = None
+    texto = botao = local = None
     veio_de_audio = False
     if tipo == "text":
         texto = msg["text"]["body"]
@@ -92,9 +92,9 @@ async def processar(msg: dict) -> None:
         veio_de_audio = True
         log.info("áudio de %s transcrito: %s", usuario, texto)
     elif tipo == "location":
-        texto = ""  # versão 2: usar latitude e longitude no lugar da região
+        local = (msg["location"]["latitude"], msg["location"]["longitude"])
 
-    respostas = conversa.responder(usuario, texto=texto, botao=botao)
+    respostas = await conversa.responder(usuario, texto=texto, botao=botao, local=local)
     for r in respostas:
         await whatsapp.enviar(usuario, r)
     if veio_de_audio:  # quem fala recebe a resposta também em áudio
@@ -104,25 +104,13 @@ async def processar(msg: dict) -> None:
         await whatsapp.enviar(usuario, {"tipo": "audio", "media_id": await whatsapp.subir_audio(ogg)})
 
 
-class AtualizacaoFila(BaseModel):
-    unidade: str
-    amarelo: int
-    verde: int
-    azul: int
-
-
-@app.post("/admin/fila")
-def atualizar_fila(dados: AtualizacaoFila, authorization: str = Header(default="")):
-    """Nível 1: a recepção da UPA (ou um coletor) informa a espera em minutos por cor."""
-    if not ADMIN_TOKEN or authorization != f"Bearer {ADMIN_TOKEN}":
-        raise HTTPException(401)
-    try:
-        repo.gravar(dados.unidade, {"amarelo": dados.amarelo, "verde": dados.verde, "azul": dados.azul})
-    except ValueError as e:
-        raise HTTPException(422, str(e))
-    return {"ok": True}
-
-
 @app.get("/fila")
 def fila_atual():
-    return [f.__dict__ for f in repo.atual()]
+    """O que o bot está usando agora: o último painel lido do portal."""
+    p = coletor.painel
+    return {
+        "atualizado_em": p.atualizado_em if p else None,
+        "coletado_em": p.coletado_em if p else None,
+        "erro": coletor.erro,
+        "unidades": [asdict(u) for u in p.unidades] if p else [],
+    }
