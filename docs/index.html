@@ -128,7 +128,7 @@ input[type=range] { width: 100%; min-width: 72px; max-width: 140px; accent-color
           <tbody id="tabela"></tbody>
         </table>
       </div>
-      <p class="nota">Cada célula mostra o tempo de espera e, embaixo, quantas pessoas estão na fila. Casos graves (vermelho) são atendidos na hora. Os links de trajeto procuram a unidade pelo nome no mapa até cadastrarmos o endereço exato de cada uma. A informação não substitui avaliação médica: com sinais de alarme, ligue 192.</p>
+      <p class="nota">Cada célula mostra o tempo de espera e, embaixo, quantas pessoas estão na fila. Casos graves (vermelho) são atendidos na hora. Endereços e coordenadas vêm do CNES (Ministério da Saúde), conferidos no OpenStreetMap. Mande a localização (📍) para ver as unidades em ordem de tempo de carro + espera. A informação não substitui avaliação médica: com sinais de alarme, ligue 192.</p>
     </section>
   </div>
 </div>
@@ -139,27 +139,27 @@ input[type=range] { width: 100%; min-width: 72px; max-width: 140px; accent-color
 const ATUALIZADO = "29/10/2026 09:34";
 const Z = [0, 0];
 const UNIDADES = [
-  { id: "upa-taboao", nome: "UPA Taboão", busca: "UPA Taboão Guarulhos SP", apelidos: ["taboao"],
+  { id: "upa-taboao", nome: "UPA Taboão", lat: -23.416254, lng: -46.507466, endereco: "Av. Silvestre Pires de Freitas, 1090 - Jardim Paraíso", conferir: true, apelidos: ["taboao"],
     adulto: [Z, [12, 4], [0, 1], Z, Z], infantil: [Z, Z, [3, 1], Z, Z] },
-  { id: "upa-sao-joao-lavras", nome: "UPA São João / Lavras", busca: "UPA São João Lavras Guarulhos SP", apelidos: ["sao joao", "lavras"],
+  { id: "upa-sao-joao-lavras", nome: "UPA São João / Lavras", lat: -23.402827, lng: -46.447448, endereco: "Estrada Guarulhos-Nazaré, 4130 - Cidade Soberana", apelidos: ["sao joao", "lavras"],
     adulto: [Z, [10, 1], [59, 7], Z, Z], infantil: [Z, Z, [1, 1], Z, Z] },
-  { id: "upa-paulista", nome: "UPA Paulista", busca: "UPA Paulista Guarulhos SP", apelidos: ["paulista"],
+  { id: "upa-paulista", nome: "UPA Paulista", lat: -23.436668, lng: -46.548861, endereco: "R. Teixeira Mendes, 166 - Jardim Paulista", apelidos: ["paulista"],
     adulto: [[4, 1], [5, 1], [26, 13], Z, Z], infantil: [Z, Z, Z, Z, Z] },
-  { id: "upa-cumbica", nome: "UPA Cumbica", busca: "UPA Cumbica Guarulhos SP", apelidos: ["cumbica"],
+  { id: "upa-cumbica", nome: "UPA Cumbica", lat: -23.453543, lng: -46.466943, endereco: "R. dos Jesuítas, 533 - Cidade Industrial Satélite", conferir: true, apelidos: ["cumbica"],
     adulto: [Z, [5, 2], [17, 8], Z, Z], infantil: [Z, Z, [3, 1], Z, Z] },
-  { id: "pronto-socorro-hmu", nome: "Pronto-Socorro HMU", busca: "Hospital Municipal de Urgências Guarulhos SP", apelidos: ["hmu", "hospital municipal de urgencias"],
+  { id: "pronto-socorro-hmu", nome: "Pronto-Socorro HMU", lat: -23.452854, lng: -46.51622, endereco: "Av. Tiradentes, 3392 - Bom Clima", apelidos: ["hmu", "hospital municipal de urgencias"],
     adulto: [[1, 1], [6, 1], Z, Z, Z], infantil: [Z, Z, Z, Z, Z] },
-  { id: "pronto-socorro-hmpb", nome: "Pronto-Socorro HMPB", busca: "Hospital Municipal Pimentas Bonsucesso Guarulhos SP", apelidos: ["hmpb", "pimentas"],
+  { id: "pronto-socorro-hmpb", nome: "Pronto-Socorro HMPB", lat: -23.440639, lng: -46.409923, endereco: "R. São José do Paraíso, 100 - Parque das Nações", apelidos: ["hmpb", "pimentas"],
     adulto: [Z, [25, 1], [123, 27], [74, 2], Z], infantil: [Z, Z, [21, 3], Z, Z] },
-  { id: "p-a-paraventi", nome: "PA Paraventi", busca: "Pronto Atendimento Paraventi Guarulhos SP", apelidos: ["paraventi"],
+  { id: "p-a-paraventi", nome: "PA Paraventi", lat: -23.449922, lng: -46.526694, endereco: "R. Joracy de Camargo, 202 - Jardim Paraventi", apelidos: ["paraventi"],
     adulto: [Z, Z, [7, 2], Z, Z], infantil: [Z, Z, Z, Z, Z] },
-  { id: "p-a-maria-dirce", nome: "PA Maria Dirce", busca: "Pronto Atendimento Maria Dirce Guarulhos SP", apelidos: ["maria dirce"],
+  { id: "p-a-maria-dirce", nome: "PA Maria Dirce", lat: -23.434212, lng: -46.426454, endereco: "R. Ubatã, 154 - Vila Maria Dirce", apelidos: ["maria dirce"],
     adulto: [Z, [2, 1], [35, 23], Z, Z], infantil: [Z, Z, [23, 3], Z, Z] },
-  { id: "p-a-dona-luiza", nome: "PA Dona Luiza", busca: "Pronto Atendimento Dona Luiza Guarulhos SP", apelidos: ["dona luiza"],
+  { id: "p-a-dona-luiza", nome: "PA Dona Luiza", lat: -23.457898, lng: -46.424716, endereco: "R. Osvaldo Nunes Dias, 55 - Jardim Centenário", apelidos: ["dona luiza"],
     adulto: [Z, Z, Z, Z, Z], infantil: [Z, Z, Z, Z, Z] },
-  { id: "p-a-bonsucesso", nome: "PA Bonsucesso", busca: "Pronto Atendimento Bonsucesso Guarulhos SP", apelidos: ["bonsucesso"],
+  { id: "p-a-bonsucesso", nome: "PA Bonsucesso", lat: -23.420419, lng: -46.407395, endereco: "Av. Dona Catharina Maria de Jesus, 85 - Bonsucesso", apelidos: ["bonsucesso"],
     adulto: [[197, 3], [113, 9], [190, 28], Z, Z], infantil: [Z, Z, Z, Z, Z] },
-  { id: "p-a-alvorada", nome: "PA Alvorada", busca: "Pronto Atendimento Alvorada Guarulhos SP", apelidos: ["alvorada"],
+  { id: "p-a-alvorada", nome: "PA Alvorada", lat: -23.438094, lng: -46.428484, endereco: "Av. Santa Helena, 145 - Jardim Maria Dirce", apelidos: ["alvorada"],
     adulto: [[104, 2], [230, 12], [223, 15], [129, 4], Z], infantil: [Z, Z, Z, Z, Z] }
 ];
 const CORES = ["🟠", "🟡", "🟢", "🔵", "⚪"];
@@ -177,15 +177,23 @@ const fmt = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)}h${String(m % 60).p
 const hhmm = d => d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 const enc = s => encodeURIComponent(s);
-const linkMaps = (u, modo, origem) => "https://www.google.com/maps/dir/?api=1" + (origem ? `&origin=${origem.join(",")}` : "") + `&destination=${enc(u.busca)}&travelmode=${modo}`;
-const linkWaze = u => `https://waze.com/ul?q=${enc(u.busca)}&navigate=yes`;
+// coordenada conferida abre o mapa no ponto; "conferir" usa o endereço (ver config/guarulhos.json)
+const destino = u => u.conferir ? enc(`${u.endereco}, Guarulhos - SP`) : `${u.lat},${u.lng}`;
+const linkMaps = (u, modo, origem) => "https://www.google.com/maps/dir/?api=1" + (origem ? `&origin=${origem.join(",")}` : "") + `&destination=${destino(u)}&travelmode=${modo}`;
+const linkWaze = u => u.conferir ? `https://waze.com/ul?q=${destino(u)}&navigate=yes` : `https://waze.com/ul?ll=${u.lat},${u.lng}&navigate=yes`;
+function minutosCarro(a, b) { // linha reta x 1,35, a 25 km/h (igual a app/rotas.py)
+  const r = Math.PI / 180, h = Math.sin((b[0] - a[0]) * r / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin((b[1] - a[1]) * r / 2) ** 2;
+  return Math.max(3, Math.round(6371 * 2 * Math.asin(Math.sqrt(h)) * 1.35 / 25 * 60));
+}
 
 // ---------- conversa (baseada em app/conversa.py) ----------
 const estado = { publico: "adulto" };
 
-function ordenar(publico) {
-  return UNIDADES.map(u => ({ ...u, espera: u[publico][VERDE][0], fila: u[publico][VERDE][1], total: u[publico].reduce((s, c) => s + c[1], 0) }))
-    .sort((a, b) => a.espera - b.espera || a.total - b.total);
+function ordenar(publico, origem) {
+  return UNIDADES.map(u => {
+    const ida = origem ? minutosCarro(origem, [u.lat, u.lng]) : null, espera = u[publico][VERDE][0];
+    return { ...u, espera, ida, fila: u[publico][VERDE][1], chave: espera + (ida || 0), total: u[publico].reduce((s, c) => s + c[1], 0) };
+  }).sort((a, b) => a.chave - b.chave || a.total - b.total);
 }
 
 function intencao(texto) {
@@ -221,14 +229,14 @@ function responder({ texto, botao, local }) {
 }
 
 function espera() {
-  const p = estado.publico, itens = ordenar(p);
+  const p = estado.publico, itens = ordenar(p, estado.origem);
   const linhas = itens.map(u => {
     const cores = u[p].map((c, i) => c[1] > 0 ? `${CORES[i]} ${fmt(c[0])}, ${c[1]} na fila` : null).filter(Boolean).join(" | ") || "✅ sem fila agora";
-    return `*${u.nome}*\n${cores}`;
+    return `*${u.nome}*${u.ida != null ? ` · 🚗 ~${fmt(u.ida)}` : ""}\n${cores}`;
   });
   const outro = p === "adulto" ? "infantil" : "adulto";
   return [
-    { tipo: "texto", texto: `⏱️ Espera agora (${p}), em ordem de menor espera para casos 🟢 pouco urgentes:\n\n` + linhas.join("\n\n") + `\n\n${LEGENDA}\nFonte: Prefeitura de Guarulhos, atualizado às ${ATUALIZADO.slice(-5)}.` },
+    { tipo: "texto", texto: `⏱️ Espera agora (${p}), em ordem de ${estado.origem ? "tempo de carro + espera 🟢" : "menor espera para casos 🟢 pouco urgentes"}:\n\n` + linhas.join("\n\n") + `\n\n${LEGENDA}\nFonte: Prefeitura de Guarulhos, atualizado às ${ATUALIZADO.slice(-5)}.` },
     { tipo: "lista", texto: "Quer o caminho até alguma delas? Escolha abaixo ou digite o nome.",
       itens: itens.slice(0, 9).map(u => ["ir_" + u.id, u.nome, u.fila ? `🟢 ${fmt(u.espera)}, ${u.fila} na fila` : "🟢 sem fila"]).concat([[outro, `Ver espera ${outro}`, ""]]) }
   ];

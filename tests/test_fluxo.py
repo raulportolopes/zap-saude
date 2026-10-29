@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from app import rotas
 from app.conversa import Conversa, como_texto
-from app.siss import Coletor, interpretar, minutos
+from app.siss import CLASSIFICACOES, Classificacao, Coletor, interpretar, minutos
 from app.whatsapp import montar_payload
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -187,3 +187,22 @@ def test_webhook(monkeypatch):
         assert c.post("/webhook", json=corpo).status_code == 200
         assert enviados and "UPA Paulista" in enviados[0][1]["texto"]
         assert len(c.get("/fila").json()["unidades"]) == 11
+
+
+def test_links_usam_coordenada_e_endereco_quando_a_coordenada_nao_foi_conferida():
+    paulista, taboao = CFG["unidades"]["upa-paulista"], CFG["unidades"]["upa-taboao"]
+    assert "ll=-23.436668,-46.548861" in rotas.link_waze(paulista)
+    assert "destination=-23.436668,-46.548861" in rotas.link_google_maps(paulista, "transit")
+    assert taboao.get("conferir") and "Silvestre%20Pires%20de%20Freitas" in rotas.link_waze(taboao)
+
+
+def test_trecho_real_do_portal():
+    """Trecho literal da página de 29/10/2026 (2 unidades), com a indentação e as entidades HTML originais."""
+    p = interpretar((RAIZ / "tests" / "fixtures" / "guarulhos_trecho_real.html").read_text(encoding="utf-8"))
+    assert [u.nome_portal for u in p.unidades] == ["UPA TABOÃO", "UPA SAO JOAO LAVRAS"]
+    assert p.atualizado_em == "29/10/2026 09:34:59"
+    lavras = p.unidades[1]
+    assert [c.nome for c in lavras.paineis["adulto"]] == list(CLASSIFICACOES)
+    assert lavras.espera("adulto", "Pouco Urgente") == Classificacao("Pouco Urgente", 59, 7)
+    assert lavras.espera("infantil", "Pouco Urgente").fila == 1
+    assert lavras.atualizado_em["infantil"] == "29/10/2026 09:34:59"

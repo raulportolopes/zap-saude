@@ -37,8 +37,13 @@ def minutos_carro(origem: tuple[float, float], destino: tuple[float, float]) -> 
     return max(3, round(distancia_km(origem, destino) * FATOR_RUA / VELOCIDADE_CARRO_KMH * 60))
 
 
+def _tem_ponto(unidade: dict) -> bool:
+    """Coordenada confiável para abrir o mapa direto no ponto. "conferir" faz o link usar o endereço."""
+    return unidade.get("lat") is not None and unidade.get("lng") is not None and not unidade.get("conferir")
+
+
 def _destino(unidade: dict) -> str:
-    if unidade.get("lat") is not None and unidade.get("lng") is not None:
+    if _tem_ponto(unidade):
         return f"{unidade['lat']},{unidade['lng']}"
     if unidade.get("endereco"):
         return f"{unidade['endereco']}, Guarulhos - SP"
@@ -54,7 +59,7 @@ def link_google_maps(unidade: dict, modo: str, origem: tuple[float, float] | Non
 
 
 def link_waze(unidade: dict) -> str:
-    if unidade.get("lat") is not None and unidade.get("lng") is not None:
+    if _tem_ponto(unidade):
         return f"https://waze.com/ul?ll={unidade['lat']},{unidade['lng']}&navigate=yes"
     return "https://waze.com/ul?" + urlencode({"q": _destino(unidade), "navigate": "yes"}, quote_via=quote)
 

@@ -2,19 +2,19 @@
   "cidade": "Guarulhos",
   "uf": "SP",
   "fonte": "https://guarulhos-portal.sissonline.com.br/servicos/tempo-espera-ps/estabelecimentos",
-  "_aviso": "Endereços e coordenadas não vêm do portal. Sem lat/lng, os links de trajeto buscam a unidade pelo nome no mapa.",
+  "_aviso": "Endereços e coordenadas (29/10/2026) da API de dados abertos do CNES, conferidos no OpenStreetMap. A do HMU veio do OSM porque a do CNES aponta para o centro. Unidades com \"conferir\": true têm coordenada não confirmada; os links delas usam o endereço até alguém conferir no mapa.",
   "unidades": {
-    "upa-taboao": {"nome": "UPA Taboão", "busca": "UPA Taboão Guarulhos SP"},
-    "upa-sao-joao-lavras": {"nome": "UPA São João / Lavras", "busca": "UPA São João Lavras Guarulhos SP", "apelidos": ["são joão", "lavras"]},
-    "upa-paulista": {"nome": "UPA Paulista", "busca": "UPA Paulista Guarulhos SP"},
-    "upa-cumbica": {"nome": "UPA Cumbica", "busca": "UPA Cumbica Guarulhos SP"},
-    "pronto-socorro-hmu": {"nome": "Pronto-Socorro HMU", "busca": "Hospital Municipal de Urgências Guarulhos SP", "apelidos": ["hospital municipal de urgências"]},
-    "pronto-socorro-hmpb": {"nome": "Pronto-Socorro HMPB", "busca": "Hospital Municipal Pimentas Bonsucesso Guarulhos SP", "apelidos": ["pimentas"]},
-    "p-a-paraventi": {"nome": "PA Paraventi", "busca": "Pronto Atendimento Paraventi Guarulhos SP"},
-    "p-a-maria-dirce": {"nome": "PA Maria Dirce", "busca": "Pronto Atendimento Maria Dirce Guarulhos SP"},
-    "p-a-dona-luiza": {"nome": "PA Dona Luiza", "busca": "Pronto Atendimento Dona Luiza Guarulhos SP"},
-    "p-a-bonsucesso": {"nome": "PA Bonsucesso", "busca": "Pronto Atendimento Bonsucesso Guarulhos SP"},
-    "p-a-alvorada": {"nome": "PA Alvorada", "busca": "Pronto Atendimento Alvorada Guarulhos SP"}
+    "upa-taboao": {"nome": "UPA Taboão", "busca": "UPA Taboão Guarulhos SP", "cnes": "2073552", "endereco": "Av. Silvestre Pires de Freitas, 1090 - Jardim Paraíso", "cep": "07144-000", "lat": -23.416254, "lng": -46.507466, "conferir": true},
+    "upa-sao-joao-lavras": {"nome": "UPA São João / Lavras", "busca": "UPA São João Lavras Guarulhos SP", "apelidos": ["são joão", "lavras"], "cnes": "6916074", "endereco": "Estrada Guarulhos-Nazaré, 4130 - Cidade Soberana", "cep": "07162-000", "lat": -23.402827, "lng": -46.447448},
+    "upa-paulista": {"nome": "UPA Paulista", "busca": "UPA Paulista Guarulhos SP", "cnes": "9242295", "endereco": "R. Teixeira Mendes, 166 - Jardim Paulista", "cep": "07083-230", "lat": -23.436668, "lng": -46.548861},
+    "upa-cumbica": {"nome": "UPA Cumbica", "busca": "UPA Cumbica Guarulhos SP", "cnes": "9400109", "endereco": "R. dos Jesuítas, 533 - Cidade Industrial Satélite", "cep": "07231-060", "lat": -23.453543, "lng": -46.466943, "conferir": true},
+    "pronto-socorro-hmu": {"nome": "Pronto-Socorro HMU", "busca": "Hospital Municipal de Urgências Guarulhos SP", "apelidos": ["hospital municipal de urgências"], "cnes": "2082861", "endereco": "Av. Tiradentes, 3392 - Bom Clima", "cep": "07196-000", "lat": -23.452854, "lng": -46.51622},
+    "pronto-socorro-hmpb": {"nome": "Pronto-Socorro HMPB", "busca": "Hospital Municipal Pimentas Bonsucesso Guarulhos SP", "apelidos": ["pimentas"], "cnes": "5200105", "endereco": "R. São José do Paraíso, 100 - Parque das Nações", "cep": "07243-550", "lat": -23.440639, "lng": -46.409923},
+    "p-a-paraventi": {"nome": "PA Paraventi", "busca": "Pronto Atendimento Paraventi Guarulhos SP", "cnes": "5595746", "endereco": "R. Joracy de Camargo, 202 - Jardim Paraventi", "cep": "07121-280", "lat": -23.449922, "lng": -46.526694},
+    "p-a-maria-dirce": {"nome": "PA Maria Dirce", "busca": "Pronto Atendimento Maria Dirce Guarulhos SP", "cnes": "2090589", "endereco": "R. Ubatã, 154 - Vila Maria Dirce", "cep": "07173-380", "lat": -23.434212, "lng": -46.426454},
+    "p-a-dona-luiza": {"nome": "PA Dona Luiza", "busca": "Pronto Atendimento Dona Luiza Guarulhos SP", "cnes": "2065444", "endereco": "R. Osvaldo Nunes Dias, 55 - Jardim Centenário", "cep": "07270-000", "lat": -23.457898, "lng": -46.424716},
+    "p-a-bonsucesso": {"nome": "PA Bonsucesso", "busca": "Pronto Atendimento Bonsucesso Guarulhos SP", "cnes": "2072130", "endereco": "Av. Dona Catharina Maria de Jesus, 85 - Bonsucesso", "cep": "07175-500", "lat": -23.420419, "lng": -46.407395},
+    "p-a-alvorada": {"nome": "PA Alvorada", "busca": "Pronto Atendimento Alvorada Guarulhos SP", "cnes": "9492380", "endereco": "Av. Santa Helena, 145 - Jardim Maria Dirce", "cep": "07241-270", "lat": -23.438094, "lng": -46.428484}
   },
   "telefones": {"samu": "192", "bombeiros": "193"}
 }

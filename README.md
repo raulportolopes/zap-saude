@@ -13,7 +13,9 @@ O portal **não tem API JSON**: a página é montada no servidor e já traz os n
 
 Para conferir o coletor no seu computador: `python -m app.siss`.
 
-O portal não informa endereço nem coordenadas. Enquanto `config/guarulhos.json` não tiver `lat`/`lng` de cada unidade, os links de trajeto procuram a unidade pelo nome no mapa (campo `busca`). Com as coordenadas preenchidas, o link vai direto ao ponto e, quando a pessoa manda a localização, o bot ordena as unidades por tempo de carro + espera.
+O portal não informa endereço nem coordenadas. Por isso `config/guarulhos.json` traz, para cada unidade, o código CNES, o endereço e `lat`/`lng`, tirados da API de dados abertos do CNES (Ministério da Saúde) e conferidos no OpenStreetMap em 29/10/2026. A coordenada do HMU veio do OpenStreetMap, porque a do CNES aponta para o centro da cidade. Com isso o link do mapa abre direto na unidade e, quando a pessoa manda a localização, o bot ordena as unidades por tempo de carro + espera.
+
+Duas unidades estão marcadas com `"conferir": true` (UPA Taboão e UPA Cumbica), porque a coordenada não pôde ser confirmada no OpenStreetMap. Os links delas usam o endereço até alguém abrir o ponto no mapa e tirar a marca.
 
 ## Trajeto
 
@@ -28,7 +30,7 @@ O portal não informa endereço nem coordenadas. Enquanto `config/guarulhos.json
 ```bash
 python -m venv .venv && source .venv/bin/activate   # no Windows: .venv\Scripts\activate
 pip install -r requirements.txt     # ffmpeg também precisa estar instalado para a voz
-python -m pytest -q                  # 18 testes do coletor, do fluxo e do webhook
+python -m pytest -q                  # 20 testes do coletor, do fluxo e do webhook
 export WA_TOKEN=...                  # token da Cloud API (Meta)
 export WA_PHONE_NUMBER_ID=...        # ID do número de teste
 export WA_VERIFY_TOKEN=um-segredo-seu
@@ -50,14 +52,14 @@ uvicorn app.main:app --port 8000
 
 | Arquivo | O que faz |
 | --- | --- |
-| `config/guarulhos.json` | Nome amigável, busca no mapa, apelidos e (quando houver) coordenadas de cada unidade |
+| `config/guarulhos.json` | Nome amigável, apelidos, CNES, endereço e coordenadas de cada unidade |
 | `app/siss.py` | Lê o painel do SISS Online e transforma o HTML em dados |
 | `app/conversa.py` | Fluxo da conversa, sem depender do WhatsApp |
 | `app/rotas.py` | Links do Waze e do Google Maps e passo a passo de ônibus (Routes API) |
 | `app/whatsapp.py` | Monta e envia as mensagens pela Cloud API |
 | `app/voz.py` | Transcreve áudio (faster-whisper) e gera a fala (gTTS + ffmpeg para OGG/OPUS) |
 | `app/main.py` | Webhook e coleta do portal a cada 5 minutos |
-| `tests/fixtures/guarulhos.html` | Página no formato do portal com o retrato de 29/10/2026 09:34, usada nos testes |
+| `tests/fixtures/` | Trecho literal da página do portal (2 unidades) e a página completa remontada com o retrato de 29/10/2026 09:34 |
 
 ## Limites do protótipo
 
