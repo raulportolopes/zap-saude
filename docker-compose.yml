@@ -1,0 +1,25 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - modelos:/cache   # modelo de transcrição baixado na primeira mensagem de áudio
+
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMINIO: ${DOMINIO}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_dados:/data
+    depends_on:
+      - bot
+
+volumes:
+  modelos:
+  caddy_dados:

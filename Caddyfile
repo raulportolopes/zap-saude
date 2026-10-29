@@ -1,0 +1,8 @@
+# Caddy recebe o HTTPS (certificado automático) e repassa para o bot.
+# Para hospedar outro projeto na mesma VPS, acrescente outro bloco, por exemplo:
+#   n8n.magox.tech {
+#       reverse_proxy n8n:5678
+#   }
+{$DOMINIO} {
+	reverse_proxy bot:8000
+}

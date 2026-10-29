@@ -41,6 +41,10 @@ uvicorn app.main:app --port 8000
 
 `GET /fila` mostra o último painel lido e o erro da última coleta, se houver.
 
+## Colocar no ar na VPS
+
+Veja o [DEPLOY.md](DEPLOY.md): Docker + Caddy (HTTPS automático), passo a passo para a VPS da Hostinger.
+
 ## Ligar no WhatsApp (número de teste gratuito da Meta)
 
 1. Em developers.facebook.com, crie um app do tipo Business e adicione o produto **WhatsApp**. A Meta dá um número de teste e permite cadastrar até 5 celulares para receber mensagens.
