@@ -1,6 +1,8 @@
 # Colocar o Zap-Saúde no ar na VPS (Hostinger KVM 2)
 
-O bot roda em Docker, com o Caddy na frente cuidando do HTTPS. Outros projetos podem dividir a mesma VPS: cada um ganha um subdomínio e um bloco no `Caddyfile`.
+O bot roda em Docker e só escuta dentro da própria VPS (`127.0.0.1:8000`). O Nginx que já está instalado na VPS publica o bot com HTTPS, assim como pode publicar outros projetos: cada um ganha um subdomínio e um arquivo em `/etc/nginx/sites-available`.
+
+Conferido em 29/10/2026 na VPS srv2049757: ela acessa o portal da prefeitura (HTTP 200) e o Nginx ocupa as portas 80 e 443.
 
 Os exemplos usam o endereço `bot.magox.tech`. Troque se preferir outro, mas não use `zapsaude.magox.tech`, que é o simulador no GitHub Pages.
 
@@ -16,13 +18,9 @@ Leva de alguns minutos a uma hora para valer.
 
 ## 2. Entrar na VPS
 
-No Windows, abra o PowerShell:
+No painel da Hostinger, em VPS > Gerenciar, clique em **Web console** (canto superior direito). Abre um terminal já logado como root. Para colar um comando, use o botão direito do mouse ou Ctrl+Shift+V.
 
-```bash
-ssh root@179.199.155.128
-```
-
-A senha de root fica no painel da Hostinger, em VPS > Gerenciar > Acesso SSH.
+Outra opção é o PowerShell do Windows: `ssh root@179.199.155.128`, com a senha de root do painel.
 
 ## 3. Conferir a VPS
 
@@ -30,20 +28,25 @@ A senha de root fica no painel da Hostinger, em VPS > Gerenciar > Acesso SSH.
 # a VPS precisa alcançar o portal da prefeitura (esperado: HTTP/1.1 200 OK)
 curl -sI https://guarulhos-portal.sissonline.com.br/servicos/tempo-espera-ps/estabelecimentos | head -1
 
-# as portas 80 e 443 precisam estar livres; se aparecer alguma linha, outro programa já usa a porta
+# quem usa as portas 80 e 443 (na VPS da Hostinger, o Nginx)
 ss -tlnp | grep -E ':(80|443) '
 ```
 
-Se as portas 80 e 443 já estiverem em uso (por exemplo, por um n8n instalado pelo catálogo da Hostinger, que vem com o próprio proxy), não siga adiante: o bot precisa entrar no proxy que já existe, e o passo 6 muda.
+Se aparecer `nginx`, siga este guia como está. Se a VPS não tiver nada nessas portas, você pode usar o Caddy incluído no projeto: no passo 6 rode `docker compose --profile caddy up -d --build` e pule o passo 7.
 
 ## 4. Instalar o Docker
 
+Veja primeiro se já está instalado (o painel da Hostinger tem um Gerenciador Docker):
+
 ```bash
-curl -fsSL https://get.docker.com | sh
-ufw allow 80,443/tcp 2>/dev/null; ufw allow OpenSSH 2>/dev/null
+docker compose version
 ```
 
-Se o firewall do painel da Hostinger estiver ativo, libere também as portas 80 e 443 lá.
+Se aparecer uma versão, pule para o passo 5. Se der "command not found":
+
+```bash
+curl -fsSL https://get.docker.com | sh
+```
 
 ## 5. Baixar o projeto e preencher as senhas
 
@@ -54,18 +57,33 @@ cp .env.example .env
 nano .env        # preencha; para salvar: Ctrl+O, Enter, Ctrl+X
 ```
 
-Para o primeiro teste, basta `DOMINIO` e `WA_VERIFY_TOKEN`. Os dados do WhatsApp entram no passo 7.
+Para o primeiro teste, basta inventar uma senha em `WA_VERIFY_TOKEN`. Os dados do WhatsApp entram no passo 8.
 
-## 6. Subir
+## 6. Subir o bot
 
 ```bash
 docker compose up -d --build
 docker compose logs -f bot      # Ctrl+C para sair dos logs
+curl -s http://127.0.0.1:8000/fila | head -c 300; echo
 ```
 
-Abra `https://bot.magox.tech/fila` no navegador. Deve aparecer a lista das 11 unidades com os tempos de agora. Se aparecer `"erro"`, a VPS não conseguiu ler o portal.
+O último comando deve mostrar o começo da lista das unidades com os tempos de agora. Se aparecer `"erro"`, a VPS não conseguiu ler o portal.
 
-## 7. Ligar no WhatsApp
+## 7. Publicar com HTTPS no Nginx
+
+```bash
+cp deploy/nginx-bot.conf /etc/nginx/sites-available/bot.magox.tech
+ln -s /etc/nginx/sites-available/bot.magox.tech /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+
+# certificado HTTPS gratuito (Let's Encrypt); o DNS do passo 1 já precisa estar valendo
+apt install -y certbot python3-certbot-nginx
+certbot --nginx -d bot.magox.tech
+```
+
+`nginx -t` precisa responder "syntax is ok" e "test is successful" antes do reload; se não responder, pare e me mande a mensagem. O certbot pergunta um e-mail e se aceita os termos. Depois disso, `https://bot.magox.tech/fila` deve abrir no navegador.
+
+## 8. Ligar no WhatsApp
 
 1. Em developers.facebook.com, crie um app do tipo **Business** e adicione o produto **WhatsApp**.
 2. Em WhatsApp > Configuração da API, copie o **token** e o **Phone number ID** para o `.env` (`WA_TOKEN` e `WA_PHONE_NUMBER_ID`). Em Configurações do app > Básico, copie a **Chave secreta do app** para `WA_APP_SECRET`.
@@ -98,12 +116,4 @@ docker compose up -d --build
 
 ## Outro projeto na mesma VPS
 
-Coloque o outro serviço no `docker-compose.yml` (ou em outro compose na mesma rede), crie o registro DNS do subdomínio e acrescente um bloco no `Caddyfile`:
-
-```
-n8n.magox.tech {
-	reverse_proxy n8n:5678
-}
-```
-
-Depois rode `docker compose restart caddy`.
+Suba o projeto escutando em outra porta local (por exemplo `127.0.0.1:5678`), copie `deploy/nginx-bot.conf` com outro nome, troque o `server_name` e a porta do `proxy_pass`, crie o registro DNS do subdomínio e repita o passo 7 com esse nome.

@@ -43,7 +43,7 @@ uvicorn app.main:app --port 8000
 
 ## Colocar no ar na VPS
 
-Veja o [DEPLOY.md](DEPLOY.md): Docker + Caddy (HTTPS automático), passo a passo para a VPS da Hostinger.
+Veja o [DEPLOY.md](DEPLOY.md): Docker, com o Nginx da VPS (ou o Caddy incluído) publicando com HTTPS, passo a passo para a VPS da Hostinger.
 
 ## Ligar no WhatsApp (número de teste gratuito da Meta)
 

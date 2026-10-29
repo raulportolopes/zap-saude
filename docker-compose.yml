@@ -3,11 +3,15 @@ services:
     build: .
     restart: unless-stopped
     env_file: .env
+    ports:
+      - "127.0.0.1:8000:8000"   # só a própria VPS acessa; o Nginx (ou o Caddy) publica com HTTPS
     volumes:
       - modelos:/cache   # modelo de transcrição baixado na primeira mensagem de áudio
 
+  # Só para VPS sem Nginx nas portas 80/443:  docker compose --profile caddy up -d
   caddy:
     image: caddy:2.8
+    profiles: ["caddy"]
     restart: unless-stopped
     ports:
       - "80:80"
